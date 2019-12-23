@@ -1,0 +1,140 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="A330ND_Pointers" Collapsed="true">
+    <Position X="12.25" Y="5.25" Width="1.5" />
+    <Compartments>
+      <Compartment Name="Fields" Collapsed="true" />
+      <Compartment Name="Methods" Collapsed="true" />
+    </Compartments>
+    <TypeIdentifier>
+      <HashCode>gAARgCKAAQAASoAQIEKBEgACCBIIUQEAEAIAEIFLIFA=</HashCode>
+      <FileName>A330ND\A330ND_Pointers.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="A330ND_LocDeviation" Collapsed="true">
+    <Position X="10.25" Y="5.25" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>ECAAAAAAngAQAoACJALAIAACmAAaICBAgBAAECAMAhA=</HashCode>
+      <FileName>A330ND\A330ND_LocDeviation.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Drawable" Collapsed="true">
+    <Position X="6.25" Y="4.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAQAIAAKAAAAAAAAAAAAAgAAAACAAIAA=</HashCode>
+      <FileName>Graphics\Drawable.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="A330ND" Collapsed="true">
+    <Position X="0.5" Y="5.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>CL+IvdCbJ5tO4pF8cuadZHtHIXWD/dFbEXeqWm5vZZw=</HashCode>
+      <FileName>A330ND\A330ND.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="A330ND_ARC" Collapsed="true">
+    <Position X="2.25" Y="5.25" Width="1.5" />
+    <InheritanceLine Type="Drawable">
+      <InheritanceModifierLabel ManuallyPlaced="true">
+        <Position X="0.07" Y="0.027" />
+      </InheritanceModifierLabel>
+    </InheritanceLine>
+    <TypeIdentifier>
+      <HashCode>AAAAOQAQAAACSgAAIMMEQAAmCEAm4QESIMGCMENIQwE=</HashCode>
+      <FileName>A330ND\A330ND_ARC.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="A330ND_Flightplan" Collapsed="true">
+    <Position X="4" Y="5.25" Width="1.75" />
+    <InheritanceLine Type="Drawable">
+      <InheritanceModifierLabel ManuallyPlaced="true">
+        <Position X="0.06" Y="0.027" />
+      </InheritanceModifierLabel>
+    </InheritanceLine>
+    <TypeIdentifier>
+      <HashCode>wIIBADAAABAVChEAckKqUABCAQQAMBAECBBAECBICAE=</HashCode>
+      <FileName>A330ND\A330ND_Flightplan.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="A330ND_GlideDeviation" Collapsed="true">
+    <Position X="6" Y="5.25" Width="2" />
+    <InheritanceLine Type="Drawable">
+      <InheritanceModifierLabel ManuallyPlaced="true">
+        <Position X="0.05" Y="0.037" />
+      </InheritanceModifierLabel>
+    </InheritanceLine>
+    <TypeIdentifier>
+      <HashCode>AAAQACAEEgKhCoAAIAIAAAACAAAQAKIEBARAECANAgA=</HashCode>
+      <FileName>A330ND\A330ND_GlideDeviation.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="A330ND_Information" Collapsed="true">
+    <Position X="8.25" Y="5.25" Width="1.75" />
+    <InheritanceLine Type="Drawable">
+      <InheritanceModifierLabel ManuallyPlaced="true">
+        <Position X="0.06" Y="0.037" />
+      </InheritanceModifierLabel>
+    </InheritanceLine>
+    <TypeIdentifier>
+      <HashCode>tLSpTpj423Mrt4yoPN6iQODbC0T8PIG8EngCEbNEW0A=</HashCode>
+      <FileName>A330ND\A330ND_Information.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="A330ND_ROSE" Collapsed="true">
+    <Position X="4.25" Y="3" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>DABAjIBAIAFIAgAAKM8HRoACCGaCkABCAQGQeBAsQEk=</HashCode>
+      <FileName>A330ND\A330ND_ROSE.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="A330ND_ScaleMarkers" Collapsed="true">
+    <Position X="6" Y="3" Width="2" />
+    <TypeIdentifier>
+      <HashCode>BAABgAECCUgI2iABIAIAEABCCBIABHQASCIEEABAEEA=</HashCode>
+      <FileName>A330ND\A330ND_ScaleMarkers.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="A330ND_Waypoint" Collapsed="true">
+    <Position X="0.75" Y="3" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>gAhQYgMAiGIAEAEDABAIiCCDCxKBRAGigQhYOAABaYE=</HashCode>
+      <FileName>A330ND\A330ND_Waypoint.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Message" Collapsed="true">
+    <Position X="8.25" Y="3" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>MAoAAJKCEgAAAEAAIgKAiAACKAAVsADICAAAMCEqAgI=</HashCode>
+      <FileName>A330ND\Message.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Waypoints" Collapsed="true">
+    <Position X="6.5" Y="0.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>CUAIAAEBAAAAAQAEACAAAgAAEAEAMAAAABCRBAAGCAI=</HashCode>
+      <FileName>A330ND\Waypoints.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Typedef Name="iter" Collapsed="true">
+    <Position X="5.75" Y="1.5" Width="3.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>A330ND\Waypoints.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="WP_Container" Collapsed="true">
+    <Position X="9.25" Y="1.5" Width="3.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>A330ND\Waypoints.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="iterCurve" Collapsed="true">
+    <Position X="2.5" Y="1.5" Width="3" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>A330ND\Waypoints.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

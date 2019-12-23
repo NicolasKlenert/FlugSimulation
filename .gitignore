@@ -1,0 +1,8 @@
+# Ignore everything
+*
+
+# Except files in the two main folders and some specific
+!ecovis_sdl1/*
+!UnitTests/*
+!.gitignore
+!ReadMe.md
