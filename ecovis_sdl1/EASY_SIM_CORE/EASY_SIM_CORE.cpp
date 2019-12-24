@@ -39,7 +39,7 @@ double Fz = 1000.0f; //Total Force in z axis in N
 double Fx = 0.0f; //Total Force in z axis in N
 
 StaticDequeue<pair<double,double>, SIZE_QUEUE> queue = StaticDequeue<pair<double, double>, SIZE_QUEUE>(true);
-Camera camera = Camera(1000,1000);
+Camera camera;
 
 EASY_SIM_CORE::EASY_SIM_CORE(int DisplayWidth, int DisplayHeight, TimeFrame* startValues)
 {
@@ -61,9 +61,12 @@ EASY_SIM_CORE::EASY_SIM_CORE(int DisplayWidth, int DisplayHeight, TimeFrame* sta
 		currentFrame = new TimeFrame();
 		//add some value so something happens
 		currentFrame->x1 = 100.0;
+		currentFrame->z0 = 1000.0;
 		frameToDelete = true;
 	}
 	else currentFrame = startValues;
+
+	camera = Camera(1000,1000,currentFrame->x0, currentFrame->z0);
 
 	
 	for(int GN=0; GN <= 3; GN++)
