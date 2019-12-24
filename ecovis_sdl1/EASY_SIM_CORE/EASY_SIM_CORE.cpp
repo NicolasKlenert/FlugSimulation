@@ -39,6 +39,7 @@ double Fz = 1000.0f; //Total Force in z axis in N
 double Fx = 0.0f; //Total Force in z axis in N
 
 StaticDequeue<pair<double,double>, SIZE_QUEUE> queue = StaticDequeue<pair<double, double>, SIZE_QUEUE>(true);
+Camera camera = Camera(1000,1000);
 
 EASY_SIM_CORE::EASY_SIM_CORE(int DisplayWidth, int DisplayHeight, TimeFrame* startValues)
 {
@@ -114,7 +115,8 @@ void EASY_SIM_CORE::CalcEASY_SIM_CORE()
 	x0dt = currentFrame->x1*dt;
 	currentFrame->x0 = currentFrame->x0 + x0dt;
 
-	queue.push_front(pair<double,double>(currentFrame->x0 * fscale, currentFrame->z0 * fscale));
+	queue.push_front(pair<double,double>(currentFrame->x0, currentFrame->z0));
+	camera.setFocusPoint(currentFrame->x0, currentFrame->z0);
 	
 	currentFrame->time = currentFrame->time + dt;
 }
@@ -182,7 +184,9 @@ void EASY_SIM_CORE::draw()
 	glPushMatrix();
     //glRotatef(0,0,0,1);
     //glTranslatef(0.2+(Engine1RPM*0.0001),0.2,0);
-	glTranslatef(0.1 + queue.front().first,0.5 + queue.front().second,0);
+	pair<double, double> position = camera.getRelativePosition(queue.front());
+	//+0.1 and +0.5 instead of +0.3 like in the camera
+	glTranslatef(position.first,position.second,0);
     drawOpenBox(0.01,0.01);      // -10 deg Rollmark
 
 	
@@ -191,7 +195,7 @@ void EASY_SIM_CORE::draw()
 	glPushMatrix();
 	glColor3ubv(white);
 	glBegin(GL_POINTS);
-	glVertex2f(0.1 + queue.front().first,0.5 + queue.front().second);
+	glVertex2f(position.first, position.second);
 	glEnd();
     glPopMatrix();
 
@@ -201,8 +205,8 @@ void EASY_SIM_CORE::draw()
 			glBegin(GL_POINTS);
 			for(int count=0; count < queue.size(); count++)
 				{
-					
-   					glVertex2f(0.1 + queue[count].first,0.5 + queue[count].second);
+					position = camera.getRelativePosition(queue[count]);
+   					glVertex2f(position.first, position.second);
 					
 				}
 			glEnd();

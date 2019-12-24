@@ -16,6 +16,7 @@
 
 #include "TimeFrame.h"
 #include "../Misc/StaticDequeue.h"
+#include "../Misc/Camera.h"
 
 #include <math.h>
 
