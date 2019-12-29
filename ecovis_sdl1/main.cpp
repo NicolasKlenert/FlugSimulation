@@ -596,7 +596,12 @@ int dataPainter(void *p)
 
 		while (!quit)
 		{
-
+			while (easy_sim_class.crashed) {
+				//draw a Game Over and a reset button
+				//-> maybe to this inside of display or even inside of viewport
+				//just reset for now
+				easy_sim_class.reset();
+			}
 			int cur_tick;
 			frame_cnt++;
 			calc_count++;

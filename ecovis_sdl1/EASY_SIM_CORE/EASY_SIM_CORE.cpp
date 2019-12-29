@@ -38,6 +38,9 @@ double dt = 0.020f; //Time Step Width in s
 double Fz = 1000.0f; //Total Force in z axis in N
 double Fx = 0.0f; //Total Force in z axis in N
 
+//TODO: instead of a constant, create a function
+double ground = 0.0;
+
 StaticDequeue<pair<double,double>, SIZE_QUEUE> queue = StaticDequeue<pair<double, double>, SIZE_QUEUE>(true);
 Camera camera;
 
@@ -57,17 +60,10 @@ EASY_SIM_CORE::EASY_SIM_CORE(int DisplayWidth, int DisplayHeight, TimeFrame* sta
 	extdt = 0;
 	TimeSys = 0;
 
-	if (startValues == nullptr) {
-		currentFrame = new TimeFrame();
-		//add some value so something happens
-		currentFrame->x1 = 100.0;
-		currentFrame->z0 = 1000.0;
-		frameToDelete = true;
-	}
-	else currentFrame = startValues;
+	reset(startValues);
 
 	camera = Camera(1000,1000,currentFrame->x0, currentFrame->z0);
-
+	crashed = false;
 	
 	for(int GN=0; GN <= 3; GN++)
 	{
@@ -80,6 +76,23 @@ EASY_SIM_CORE::EASY_SIM_CORE(int DisplayWidth, int DisplayHeight, TimeFrame* sta
 	}
 
 	Time = 0;
+}
+
+void EASY_SIM_CORE::reset(TimeFrame* startValues) {
+	if (frameToDelete && currentFrame != nullptr) {
+		delete(currentFrame);
+	}
+	crashed = false;
+	if (startValues == nullptr) {
+		currentFrame = new TimeFrame();
+		//add some value so something happens
+		currentFrame->x1 = 100.0;
+		currentFrame->z0 = 1000.0;
+		frameToDelete = true;
+	} else {
+		currentFrame = startValues; 
+		frameToDelete = false;
+	}
 }
 
 EASY_SIM_CORE::~EASY_SIM_CORE() 
@@ -120,6 +133,7 @@ void EASY_SIM_CORE::CalcEASY_SIM_CORE()
 
 	queue.push_front(pair<double,double>(currentFrame->x0, currentFrame->z0));
 	camera.setFocusPoint(currentFrame->x0, currentFrame->z0);
+	if (currentFrame->z0 < ground) crashed = true;
 	
 	currentFrame->time = currentFrame->time + dt;
 }
@@ -221,39 +235,39 @@ void EASY_SIM_CORE::draw()
 	float x, y;
 
 	//Graph##############################################################
-    glPushMatrix();
-	int GraphNr = 1;
-    /*glPushAttrib(GL_CURRENT_BIT);*/
-	const float fXScFactor = 2.0f;
-	const float fYScFactor = 0.05f;
-	//Scale X Axis & Y Axis
-		glColor3ubv(green);
-		glTranslatef(0.1,0.5,0);
-		glScalef(0.001,0.001,0.001);
-		glBegin(GL_LINES);
+ //   glPushMatrix();
+	//int GraphNr = 1;
+ //   /*glPushAttrib(GL_CURRENT_BIT);*/
+	//const float fXScFactor = 2.0f;
+	//const float fYScFactor = 0.05f;
+	////Scale X Axis & Y Axis
+	//	glColor3ubv(green);
+	//	glTranslatef(0.1,0.5,0);
+	//	glScalef(0.001,0.001,0.001);
+	//	glBegin(GL_LINES);
 
-			//x-axis
-			glVertex2f(0, 0);
-			glVertex2f(800, 0);
+	//		//x-axis
+	//		/*glVertex2f(0, 0);
+	//		glVertex2f(800, 0);*/
 
-			//z-axis
-			glVertex2f(0, 400);
-			glVertex2f(0, -400);
+	//		//z-axis
+	//		/*glVertex2f(0, 400);
+	//		glVertex2f(0, -400);*/
 
-			//top and bottom
-			glColor3ubv(white);
-			glVertex2f(0, 400);
-			glVertex2f(800, 400);
+	//		//top and bottom
+	//		/*glColor3ubv(white);
+	//		glVertex2f(0, 400);
+	//		glVertex2f(800, 400);
 
-			glVertex2f(0, -400);
-			glVertex2f(800, -400);
-		glEnd();
+	//		glVertex2f(0, -400);
+	//		glVertex2f(800, -400);*/
+	//	glEnd();
 
-		fStickPitchCmd_Value[GraphNr][iScaleStep]	= Engine1RPM;
-		fTimeScale_Value[GraphNr][iScaleStep]		= 0.5f; //*_FrameTime;
-		fElevator_Pos[GraphNr][iScaleStep]			= 8000.0f;
-		if (iScaleStep<GraphLength-1) iScaleStep++;
-		else iScaleStep = 0;
+	//	fStickPitchCmd_Value[GraphNr][iScaleStep]	= Engine1RPM;
+	//	fTimeScale_Value[GraphNr][iScaleStep]		= 0.5f; //*_FrameTime;
+	//	fElevator_Pos[GraphNr][iScaleStep]			= 8000.0f;
+	//	if (iScaleStep<GraphLength-1) iScaleStep++;
+	//	else iScaleStep = 0;
 			
 	/*	{
 			float fXScalePos = 0.0f;
@@ -306,10 +320,10 @@ void EASY_SIM_CORE::draw()
 		//}
 
 
-		glTranslated(750,-30,500);
+		/*glTranslated(750,-30,500);
 		glColor3ubv(green);
 		font0->print(Font::ALIGN_LEFT, "x-axis");
-		glPopMatrix();
+		glPopMatrix();*/
 
 
 
@@ -323,7 +337,9 @@ void EASY_SIM_CORE::draw()
 	//glPopMatrix();
 	//Graph##############################################################
 
-
+	//Draw ground (TODO: only if we can see the ground)
+	double relativeGround = camera.getRelativeZ(0.0);
+	drawLine(0.0, relativeGround, 1.0, relativeGround);
 
     glPushMatrix();
 	glColor3ubv(amber_0);
@@ -363,6 +379,15 @@ void EASY_SIM_CORE::draw()
 	////DRAW SPD SCALE
 	//SpdScale->draw();
 	
+}
+
+void EASY_SIM_CORE::drawLine(float startX, float startY, float endX, float endY) {
+	glPushMatrix();
+	glBegin(GL_LINE_STRIP);
+	glVertex2f(startX, startY);
+	glVertex2f(endX,endY);
+	glEnd();
+	glPopMatrix();
 }
 
 void EASY_SIM_CORE::drawTriangle(float height, float angle, float rotation, bool filled)
