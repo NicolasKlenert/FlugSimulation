@@ -59,6 +59,7 @@ int yPos = 0;									//y position of the clicked mouse
 bool bKeyUp = FALSE;
 bool bKeyDn = FALSE;
 int iWhichKey = 0;
+int rotateAoA = 0; // used to rotate angle of attack
 
 bool quit = false;
 bool headUp = true;
@@ -262,26 +263,26 @@ int eventProcessor(void *p)
 			else if (event.key.keysym.sym == SDLK_RIGHT && !bKeyDn)
 			{
 				//view->setFocusPoint(e_X, view->getFocusPoint(e_X)+ 0.1);
-
+				rotateAoA = -1;
 				bKeyDn = TRUE;
 			}
 			else if (event.key.keysym.sym == SDLK_LEFT && !bKeyDn)
 			{
 				//view->setFocusPoint(e_X, view->getFocusPoint(e_X)- 0.1);
-
+				rotateAoA = 1;
 				bKeyDn = TRUE;
 			}
 			else if (event.key.keysym.sym == SDLK_UP && !bKeyDn)
 			{
 				//view->setFocusPoint(e_Y, view->getFocusPoint(e_Y)+ 0.1);
 
-
+				rotateAoA = 1;
 				bKeyDn = TRUE;
 			}
 			else if (event.key.keysym.sym == SDLK_DOWN && !bKeyDn)
 			{
 				//view->setFocusPoint(e_Y, view->getFocusPoint(e_Y)- 0.1);
-
+				rotateAoA = -1;
 				bKeyDn = TRUE;
 			}
 			else if (event.key.keysym.sym == SDLK_PERIOD)
@@ -292,14 +293,14 @@ int eventProcessor(void *p)
 			{
 				view->setFocusPoint(e_Z, view->getFocusPoint(e_Z) - 0.1);
 			}
-			else if (event.key.keysym.sym == SDLK_1 && !bKeyDn)
-			{
-				iWhichKey = 1;
-				bKeyDn = TRUE;
-			}
 			else if (event.key.keysym.sym == SDLK_0 && !bKeyDn)
 			{
 				iWhichKey = 0;
+				bKeyDn = TRUE;
+			}
+			else if (event.key.keysym.sym == SDLK_1 && !bKeyDn)
+			{
+				iWhichKey = 1;
 				bKeyDn = TRUE;
 			}
 			else if (event.key.keysym.sym == SDLK_2 && !bKeyDn)
@@ -642,23 +643,25 @@ int dataPainter(void *p)
 
 			if (bKeyDn)
 			{
+				easy_sim_class.rotate = rotateAoA;
 				if (iWhichKey == 0)
 				{
-
+					
 				}
 				if (iWhichKey == 1)
 				{
-
+					
 				}
 				if (iWhichKey == 2)
 				{
-
+					
 				}
 				if (iWhichKey == 3)
 				{
-
+					
 				}
-
+			} else {
+				easy_sim_class.rotate = 0;
 			}
 
 			Sleep(2);

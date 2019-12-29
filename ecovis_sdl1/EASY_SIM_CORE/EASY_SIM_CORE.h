@@ -35,6 +35,7 @@ public:
 	double timediff;
 	double extdt;
 	bool crashed;
+	int rotate;
 
 private:
 	void drawRhombus(float height, float width, float rotation, bool filled);
@@ -42,6 +43,7 @@ private:
 	void drawTrapezoid(float angle, float height, float baseWidth);
 	void drawTriangle(float height, float angle, float rotation, bool filled);
 	void drawLine(float startX, float startY, float endX, float endY);
+	void drawLine(float length, float angle);
 
 	Font   *font0, *font1, *font2, *font3, *font4;
 	RectSprite *RSprite1;

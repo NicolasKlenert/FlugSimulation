@@ -32,11 +32,15 @@ bool frameToDelete = false;
 
 float fscale = 0.001f;
 
-double m = 100.0f; //Mass in kg
-double g = -9.81f; //Earth acceleration in m/s²
-double dt = 0.020f; //Time Step Width in s
-double Fz = 1000.0f; //Total Force in z axis in N
-double Fx = 0.0f; //Total Force in z axis in N
+double m = 100.0; //Mass in kg
+double g = -9.81; //Earth acceleration in m/s²
+double dt = 0.020; //Time Step Width in s -> NOT USED
+double wingArea = 100.0; //Area of the wings m^2
+double airDensity = 1200.0; //f(T,p) normally kg/m^3
+double ascentAviationCoefficient = 5.5;
+double startAviationCoefficient = 0.3;
+double rotationRate = 0.1;
+
 
 //TODO: instead of a constant, create a function
 double ground = 0.0;
@@ -59,6 +63,7 @@ EASY_SIM_CORE::EASY_SIM_CORE(int DisplayWidth, int DisplayHeight, TimeFrame* sta
 	timediff = 0;
 	extdt = 0;
 	TimeSys = 0;
+	rotate = 0;
 
 	reset(startValues);
 
@@ -117,10 +122,13 @@ void EASY_SIM_CORE::CalcEASY_SIM_CORE()
 
 	dt = extdt;
 	//Differential Equation Calculation for x and z axis
-	//z2 = g - Fa/m - Fr/m;
-	 
-	z1dt = g*dt;
-	currentFrame->z1 = currentFrame->z1 + z1dt;
+	//z2 = g + Fa/m + Fr/m;
+	double aviationCoefficient = ascentAviationCoefficient * currentFrame->angleOfAttack + startAviationCoefficient;
+	double trueAirSpeed = currentFrame->x1;
+	//should only be 0.5* but is wayyy to big -> google!
+	double Fa = 0.000000005 * airDensity * trueAirSpeed * trueAirSpeed *aviationCoefficient * wingArea;
+	currentFrame->z2 = g + Fa/m;
+	currentFrame->z1 = currentFrame->z1 + currentFrame->z2 * dt;
 
 	z0dt = currentFrame->z1*dt;
 	currentFrame->z0 = currentFrame->z0 + z0dt;
@@ -136,6 +144,8 @@ void EASY_SIM_CORE::CalcEASY_SIM_CORE()
 	if (currentFrame->z0 < ground) crashed = true;
 	
 	currentFrame->time = currentFrame->time + dt;
+
+	currentFrame->angleOfAttack += rotate * rotationRate;
 }
 
 void EASY_SIM_CORE::draw()
@@ -199,24 +209,24 @@ void EASY_SIM_CORE::draw()
 
 	//AC BOX
 	glPushMatrix();
-    //glRotatef(0,0,0,1);
-    //glTranslatef(0.2+(Engine1RPM*0.0001),0.2,0);
+ //   //glRotatef(0,0,0,1);
+ //   //glTranslatef(0.2+(Engine1RPM*0.0001),0.2,0);
 	pair<double, double> position = camera.getRelativePosition(queue.front());
-	//+0.1 and +0.5 instead of +0.3 like in the camera
+	////+0.1 and +0.5 instead of +0.3 like in the camera
 	glTranslatef(position.first,position.second,0);
-    drawOpenBox(0.01,0.01);      // -10 deg Rollmark
-
-	
+ //   drawOpenBox(0.01,0.01);      // -10 deg Rollmark
+	drawLine(0.05,currentFrame->angleOfAttack);
     glPopMatrix();
 
-	glPushMatrix();
-	glColor3ubv(white);
-	glBegin(GL_POINTS);
-	glVertex2f(position.first, position.second);
-	glEnd();
-    glPopMatrix();
+	//glPushMatrix();
+	//glColor3ubv(white);
+	//glBegin(GL_POINTS);
+	//glVertex2f(position.first, position.second);
+	//glEnd();
+ //   glPopMatrix();
 
 	{
+		pair<double, double> position;
 		
 			glColor3ubv(white);
 			glBegin(GL_POINTS);
@@ -386,6 +396,16 @@ void EASY_SIM_CORE::drawLine(float startX, float startY, float endX, float endY)
 	glBegin(GL_LINE_STRIP);
 	glVertex2f(startX, startY);
 	glVertex2f(endX,endY);
+	glEnd();
+	glPopMatrix();
+}
+
+void EASY_SIM_CORE::drawLine(float length, float angle) {
+	glPushMatrix();
+	glRotatef(angle, 0, 0, 1);
+	glBegin(GL_LINE_STRIP);
+	glVertex2f(-length/2, 0);
+	glVertex2f(length/2, 0);
 	glEnd();
 	glPopMatrix();
 }

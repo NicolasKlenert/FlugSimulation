@@ -6,4 +6,5 @@ struct TimeFrame {
 	double x1 = 0.0;
 	double x2 = 0.0;
 	double time = 0.0;
+	double angleOfAttack = 0.0; //in radians
 };
