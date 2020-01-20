@@ -1,0 +1,36 @@
+﻿  EASY_SIM_CORE.cpp
+cl : command line warning D9035: option 'Gm' has been deprecated and will be removed in a future release
+C:\Users\Nicol\Documents\Visual Studio 2019\EASY_SIM_V1_2017\ecovis_sdl1\Graphics\Font.h(20,56): warning C4290: C++ exception specification ignored except to indicate a function is not __declspec(nothrow)
+C:\Users\Nicol\Documents\Visual Studio 2019\EASY_SIM_V1_2017\ecovis_sdl1\Graphics\Font.h(41,57): warning C4290: C++ exception specification ignored except to indicate a function is not __declspec(nothrow)
+C:\Users\Nicol\Documents\Visual Studio 2019\EASY_SIM_V1_2017\ecovis_sdl1\EASY_SIM_CORE\EASY_SIM_CORE.cpp(60,47): warning C4305: 'argument': truncation from 'double' to 'float'
+C:\Users\Nicol\Documents\Visual Studio 2019\EASY_SIM_V1_2017\ecovis_sdl1\EASY_SIM_CORE\EASY_SIM_CORE.cpp(119,9): warning C4101: 'z1dt': unreferenced local variable
+C:\Users\Nicol\Documents\Visual Studio 2019\EASY_SIM_V1_2017\ecovis_sdl1\EASY_SIM_CORE\EASY_SIM_CORE.cpp(216,38): warning C4244: 'argument': conversion from '_Ty2' to 'GLfloat', possible loss of data
+C:\Users\Nicol\Documents\Visual Studio 2019\EASY_SIM_V1_2017\ecovis_sdl1\EASY_SIM_CORE\EASY_SIM_CORE.cpp(216,38): warning C4244:         with
+C:\Users\Nicol\Documents\Visual Studio 2019\EASY_SIM_V1_2017\ecovis_sdl1\EASY_SIM_CORE\EASY_SIM_CORE.cpp(216,38): warning C4244:         [
+C:\Users\Nicol\Documents\Visual Studio 2019\EASY_SIM_V1_2017\ecovis_sdl1\EASY_SIM_CORE\EASY_SIM_CORE.cpp(216,38): warning C4244:             _Ty2=double
+C:\Users\Nicol\Documents\Visual Studio 2019\EASY_SIM_V1_2017\ecovis_sdl1\EASY_SIM_CORE\EASY_SIM_CORE.cpp(216,38): warning C4244:         ]
+C:\Users\Nicol\Documents\Visual Studio 2019\EASY_SIM_V1_2017\ecovis_sdl1\EASY_SIM_CORE\EASY_SIM_CORE.cpp(216,23): warning C4244: 'argument': conversion from '_Ty1' to 'GLfloat', possible loss of data
+C:\Users\Nicol\Documents\Visual Studio 2019\EASY_SIM_V1_2017\ecovis_sdl1\EASY_SIM_CORE\EASY_SIM_CORE.cpp(216,23): warning C4244:         with
+C:\Users\Nicol\Documents\Visual Studio 2019\EASY_SIM_V1_2017\ecovis_sdl1\EASY_SIM_CORE\EASY_SIM_CORE.cpp(216,23): warning C4244:         [
+C:\Users\Nicol\Documents\Visual Studio 2019\EASY_SIM_V1_2017\ecovis_sdl1\EASY_SIM_CORE\EASY_SIM_CORE.cpp(216,23): warning C4244:             _Ty1=double
+C:\Users\Nicol\Documents\Visual Studio 2019\EASY_SIM_V1_2017\ecovis_sdl1\EASY_SIM_CORE\EASY_SIM_CORE.cpp(216,23): warning C4244:         ]
+C:\Users\Nicol\Documents\Visual Studio 2019\EASY_SIM_V1_2017\ecovis_sdl1\EASY_SIM_CORE\EASY_SIM_CORE.cpp(218,28): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Users\Nicol\Documents\Visual Studio 2019\EASY_SIM_V1_2017\ecovis_sdl1\EASY_SIM_CORE\EASY_SIM_CORE.cpp(218,43): warning C4305: 'argument': truncation from 'double' to 'float'
+C:\Users\Nicol\Documents\Visual Studio 2019\EASY_SIM_V1_2017\ecovis_sdl1\EASY_SIM_CORE\EASY_SIM_CORE.cpp(233,27): warning C4018: '<': signed/unsigned mismatch
+C:\Users\Nicol\Documents\Visual Studio 2019\EASY_SIM_V1_2017\ecovis_sdl1\EASY_SIM_CORE\EASY_SIM_CORE.cpp(236,44): warning C4244: 'argument': conversion from '_Ty2' to 'GLfloat', possible loss of data
+C:\Users\Nicol\Documents\Visual Studio 2019\EASY_SIM_V1_2017\ecovis_sdl1\EASY_SIM_CORE\EASY_SIM_CORE.cpp(236,44): warning C4244:         with
+C:\Users\Nicol\Documents\Visual Studio 2019\EASY_SIM_V1_2017\ecovis_sdl1\EASY_SIM_CORE\EASY_SIM_CORE.cpp(236,44): warning C4244:         [
+C:\Users\Nicol\Documents\Visual Studio 2019\EASY_SIM_V1_2017\ecovis_sdl1\EASY_SIM_CORE\EASY_SIM_CORE.cpp(236,44): warning C4244:             _Ty2=double
+C:\Users\Nicol\Documents\Visual Studio 2019\EASY_SIM_V1_2017\ecovis_sdl1\EASY_SIM_CORE\EASY_SIM_CORE.cpp(236,44): warning C4244:         ]
+C:\Users\Nicol\Documents\Visual Studio 2019\EASY_SIM_V1_2017\ecovis_sdl1\EASY_SIM_CORE\EASY_SIM_CORE.cpp(236,28): warning C4244: 'argument': conversion from '_Ty1' to 'GLfloat', possible loss of data
+C:\Users\Nicol\Documents\Visual Studio 2019\EASY_SIM_V1_2017\ecovis_sdl1\EASY_SIM_CORE\EASY_SIM_CORE.cpp(236,28): warning C4244:         with
+C:\Users\Nicol\Documents\Visual Studio 2019\EASY_SIM_V1_2017\ecovis_sdl1\EASY_SIM_CORE\EASY_SIM_CORE.cpp(236,28): warning C4244:         [
+C:\Users\Nicol\Documents\Visual Studio 2019\EASY_SIM_V1_2017\ecovis_sdl1\EASY_SIM_CORE\EASY_SIM_CORE.cpp(236,28): warning C4244:             _Ty1=double
+C:\Users\Nicol\Documents\Visual Studio 2019\EASY_SIM_V1_2017\ecovis_sdl1\EASY_SIM_CORE\EASY_SIM_CORE.cpp(236,28): warning C4244:         ]
+C:\Users\Nicol\Documents\Visual Studio 2019\EASY_SIM_V1_2017\ecovis_sdl1\EASY_SIM_CORE\EASY_SIM_CORE.cpp(352,37): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Users\Nicol\Documents\Visual Studio 2019\EASY_SIM_V1_2017\ecovis_sdl1\EASY_SIM_CORE\EASY_SIM_CORE.cpp(352,16): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Users\Nicol\Documents\Visual Studio 2019\EASY_SIM_V1_2017\ecovis_sdl1\EASY_SIM_CORE\EASY_SIM_CORE.cpp(358,24): warning C4305: 'argument': truncation from 'double' to 'GLfloat'
+C:\Users\Nicol\Documents\Visual Studio 2019\EASY_SIM_V1_2017\ecovis_sdl1\EASY_SIM_CORE\EASY_SIM_CORE.cpp(245,11): warning C4101: 'y': unreferenced local variable
+C:\Users\Nicol\Documents\Visual Studio 2019\EASY_SIM_V1_2017\ecovis_sdl1\EASY_SIM_CORE\EASY_SIM_CORE.cpp(245,8): warning C4101: 'x': unreferenced local variable
+EASY_SIM_CORE.obj : warning LNK4075: ignoring '/EDITANDCONTINUE' due to '/OPT:REF' specification
+  DemoDisplay.vcxproj -> C:\Users\Nicol\Documents\Visual Studio 2019\EASY_SIM_V1_2017\ecovis_sdl1\..\bin\DemoDisplay.exe
