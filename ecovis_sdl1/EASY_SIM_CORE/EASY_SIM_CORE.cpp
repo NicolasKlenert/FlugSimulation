@@ -8,9 +8,11 @@
 #include <stdlib.h>
 
 #include "EASY_SIM_CORE.h"
+#include <math.h>
 
 #define PI 3.1415926535
 #define SIZE_QUEUE 1000
+#define DEGREES 0.0174532925
 
 float Engine1RPM = 0.0f;
 int iTestTimer = 0;
@@ -32,14 +34,20 @@ bool frameToDelete = false;
 
 float fscale = 0.001f;
 
-double m = 100.0; //Mass in kg
+double m = 60000.0; //Mass in kg
 double g = -9.81; //Earth acceleration in m/s²
 double dt = 0.020; //Time Step Width in s -> NOT USED
-double wingArea = 100.0; //Area of the wings m^2
-double airDensity = 1200.0; //f(T,p) normally kg/m^3
+double wingArea = 600.0; //Area of the wings m^2
+double airDensity = 1.200; //f(T,p) normally kg/m^3
 double ascentAviationCoefficient = 5.5;
 double startAviationCoefficient = 0.3;
-double rotationRate = 0.1;
+double maxAngleOfAttack = 20 * DEGREES;
+double totalLossAngle = 25 * DEGREES;
+double startDragCoefficient = 0.02;
+double oswaldNumber = 0.7;
+double wingSpan = 60;
+double rotationRate = 0.01;
+double maxThrust = 0.0;//500000.0;
 
 
 //TODO: instead of a constant, create a function
@@ -123,18 +131,33 @@ void EASY_SIM_CORE::CalcEASY_SIM_CORE()
 	dt = extdt;
 	//Differential Equation Calculation for x and z axis
 	//z2 = g + Fa/m + Fr/m;
-	double aviationCoefficient = ascentAviationCoefficient * currentFrame->angleOfAttack + startAviationCoefficient;
-	double trueAirSpeed = currentFrame->x1;
-	//should only be 0.5* but is wayyy to big -> google!
-	double Fa = 0.000000005 * airDensity * trueAirSpeed * trueAirSpeed *aviationCoefficient * wingArea;
-	currentFrame->z2 = g + Fa/m;
-	currentFrame->z1 = currentFrame->z1 + currentFrame->z2 * dt;
+	double angleOfAttack = currentFrame->get_direction_of_speed();//no wind yet
+	double aviationCoefficient = ascentAviationCoefficient * angleOfAttack + startAviationCoefficient;
+	if (angleOfAttack >= maxAngleOfAttack) {
+		double alpha = (angleOfAttack - maxAngleOfAttack) / totalLossAngle;
+		if (alpha > 1) {
+			alpha = 1;
+		}
+		//angleOfAttack -= angleOfAttack * alpha;
+		aviationCoefficient -= aviationCoefficient * alpha;
+	}
+	double trueAirSpeedSquared = currentFrame->get_speed_squared();
+	double lift = 0.5 * airDensity * trueAirSpeedSquared *aviationCoefficient * wingArea;
 
+	double wingAspectRatio = wingSpan * wingSpan / wingArea;
+	double dragCoefficient = startDragCoefficient + aviationCoefficient * aviationCoefficient / (PI * oswaldNumber * wingAspectRatio);
+	double drag = 0.5 * airDensity * trueAirSpeedSquared * dragCoefficient * wingArea;
+
+	double resultThrust = maxThrust - drag;
+
+	currentFrame->z2 = g + cos(angleOfAttack)*lift/m + sin(angleOfAttack) * resultThrust /m;
+	currentFrame->z1 = currentFrame->z1 + currentFrame->z2 * dt;
+	//Missing: thrust and drag! (also lift should be done in the direction of the top of the plane!)
 	z0dt = currentFrame->z1*dt;
 	currentFrame->z0 = currentFrame->z0 + z0dt;
 
-	x1dt = 0;
-	currentFrame->x1 = currentFrame->x1 + x1dt;
+	currentFrame->x2 = sin(angleOfAttack) * lift / m + cos(angleOfAttack) * resultThrust /m;
+	currentFrame->x1 = currentFrame->x1 + currentFrame->x2 * dt;
 
 	x0dt = currentFrame->x1*dt;
 	currentFrame->x0 = currentFrame->x0 + x0dt;
@@ -145,7 +168,7 @@ void EASY_SIM_CORE::CalcEASY_SIM_CORE()
 	
 	currentFrame->time = currentFrame->time + dt;
 
-	currentFrame->angleOfAttack += rotate * rotationRate;
+	currentFrame->direction += rotate * rotationRate;
 }
 
 void EASY_SIM_CORE::draw()
@@ -215,7 +238,7 @@ void EASY_SIM_CORE::draw()
 	////+0.1 and +0.5 instead of +0.3 like in the camera
 	glTranslatef(position.first,position.second,0);
  //   drawOpenBox(0.01,0.01);      // -10 deg Rollmark
-	drawLine(0.05,currentFrame->angleOfAttack);
+	drawLine(0.05,currentFrame->direction*180 /  PI);
     glPopMatrix();
 
 	//glPushMatrix();
@@ -361,11 +384,13 @@ void EASY_SIM_CORE::draw()
 	glTranslatef(0.5,-20,0);
     font0->print(Font::ALIGN_LEFT, "Meter: %.3f", currentFrame->z0);
 	glTranslatef(0.5,-20,0);
-    font0->print(Font::ALIGN_LEFT, "Speed: %.3f", currentFrame->z1*3.6f);
+    font0->print(Font::ALIGN_LEFT, "Speed: %.3f", sqrt(currentFrame->get_speed_squared()));
 	glTranslatef(0.5,-20,0);
     font0->print(Font::ALIGN_LEFT, "Time: %.3f", (float)Time/1000.0f);
 	glTranslatef(0.5,-20,0);
     font0->print(Font::ALIGN_LEFT, "Meter x: %.3f", currentFrame->x0);
+	glTranslatef(0.5, -20, 0);
+	font0->print(Font::ALIGN_LEFT, "Angle in Degree: %.3f", currentFrame->direction*180 / PI);
 
 	glTranslatef(0.5,-30,0);
     font0->print(Font::ALIGN_LEFT, "SimTimedt: %.3f", currentFrame->time);

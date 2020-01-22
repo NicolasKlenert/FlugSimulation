@@ -1,3 +1,5 @@
+#include <math.h>
+
 struct TimeFrame {
 	double z0 = 0.0;   //z2 - z axis acceleration, z1 - z axis velocity, z0 - z axis position etc.
 	double z1 = 0.0;
@@ -6,5 +8,13 @@ struct TimeFrame {
 	double x1 = 0.0;
 	double x2 = 0.0;
 	double time = 0.0;
-	double angleOfAttack = 0.0; //in radians
+	double direction = 0.0; //in radians
+
+	double get_speed_squared() {
+		return x1*x1 + z1*z1;
+	}
+
+	double get_direction_of_speed() {
+		return atan2(z1,x1);
+	}
 };
