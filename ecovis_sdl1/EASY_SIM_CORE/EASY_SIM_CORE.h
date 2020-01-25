@@ -44,6 +44,7 @@ private:
 	void drawTriangle(float height, float angle, float rotation, bool filled);
 	void drawLine(float startX, float startY, float endX, float endY);
 	void drawLine(float length, float angle);
+	double calculate_drag(double coefficient);
 
 	Font   *font0, *font1, *font2, *font3, *font4;
 	RectSprite *RSprite1;

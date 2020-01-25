@@ -43,11 +43,13 @@ double ascentAviationCoefficient = 5.5;
 double startAviationCoefficient = 0.3;
 double maxAngleOfAttack = 20 * DEGREES;
 double totalLossAngle = 25 * DEGREES;
-double startDragCoefficient = 0.02;
+double dragCoefficientFriction = 0.02;
+double dragCoefficientFormMin = 0.09;
+double dragCoefficientFormMax = 1.8;
 double oswaldNumber = 0.7;
 double wingSpan = 60;
 double rotationRate = 0.01;
-double maxThrust = 0.0;//500000.0;
+double maxThrust = 5000000.0;
 
 
 //TODO: instead of a constant, create a function
@@ -55,6 +57,10 @@ double ground = 0.0;
 
 StaticDequeue<pair<double,double>, SIZE_QUEUE> queue = StaticDequeue<pair<double, double>, SIZE_QUEUE>(true);
 Camera camera;
+
+double EASY_SIM_CORE::calculate_drag(double coefficient) {
+	return 0.5 * airDensity * currentFrame->get_speed_squared() * coefficient * wingArea;
+}
 
 EASY_SIM_CORE::EASY_SIM_CORE(int DisplayWidth, int DisplayHeight, TimeFrame* startValues)
 {
@@ -131,7 +137,9 @@ void EASY_SIM_CORE::CalcEASY_SIM_CORE()
 	dt = extdt;
 	//Differential Equation Calculation for x and z axis
 	//z2 = g + Fa/m + Fr/m;
-	double angleOfAttack = currentFrame->get_direction_of_speed();//no wind yet
+	double directionOfSpeed = currentFrame->get_direction_of_speed();
+	//swap directions!
+	double angleOfAttack = currentFrame->direction - directionOfSpeed;//no wind yet
 	double aviationCoefficient = ascentAviationCoefficient * angleOfAttack + startAviationCoefficient;
 	if (angleOfAttack >= maxAngleOfAttack) {
 		double alpha = (angleOfAttack - maxAngleOfAttack) / totalLossAngle;
@@ -141,24 +149,24 @@ void EASY_SIM_CORE::CalcEASY_SIM_CORE()
 		//angleOfAttack -= angleOfAttack * alpha;
 		aviationCoefficient -= aviationCoefficient * alpha;
 	}
+	aviationCoefficient = 0 > aviationCoefficient ? 0 : aviationCoefficient;
 	double trueAirSpeedSquared = currentFrame->get_speed_squared();
-	double lift = 0.5 * airDensity * trueAirSpeedSquared *aviationCoefficient * wingArea;
+	double lift = 0.5 * airDensity * trueAirSpeedSquared * aviationCoefficient * wingArea;
 
 	double wingAspectRatio = wingSpan * wingSpan / wingArea;
-	double dragCoefficient = startDragCoefficient + aviationCoefficient * aviationCoefficient / (PI * oswaldNumber * wingAspectRatio);
-	double drag = 0.5 * airDensity * trueAirSpeedSquared * dragCoefficient * wingArea;
+	double dragCoefficientInduced = aviationCoefficient * aviationCoefficient / (PI * oswaldNumber * wingAspectRatio);
+	double dragCoefficientParasitic = dragCoefficientFriction + dragCoefficientFormMin + dragCoefficientFormMax * (sin(angleOfAttack) + 1) * 0.5;
 
-	double resultThrust = maxThrust - drag;
+	double resultThrust = maxThrust;// -this->calculate_drag(dragCoefficientInduced);
+	double parasiticDrag = this->calculate_drag(dragCoefficientParasitic);
 
-	currentFrame->z2 = g + cos(angleOfAttack)*lift/m + sin(angleOfAttack) * resultThrust /m;
+	currentFrame->z2 = g + cos(currentFrame->direction) * lift / m + sin(currentFrame->direction) * resultThrust / m -sin(directionOfSpeed) * parasiticDrag / m;
 	currentFrame->z1 = currentFrame->z1 + currentFrame->z2 * dt;
-	//Missing: thrust and drag! (also lift should be done in the direction of the top of the plane!)
 	z0dt = currentFrame->z1*dt;
 	currentFrame->z0 = currentFrame->z0 + z0dt;
 
-	currentFrame->x2 = sin(angleOfAttack) * lift / m + cos(angleOfAttack) * resultThrust /m;
+	currentFrame->x2 = -sin(currentFrame->direction) * lift / m + cos(currentFrame->direction) * resultThrust / m -cos(directionOfSpeed) * parasiticDrag / m;
 	currentFrame->x1 = currentFrame->x1 + currentFrame->x2 * dt;
-
 	x0dt = currentFrame->x1*dt;
 	currentFrame->x0 = currentFrame->x0 + x0dt;
 
@@ -169,6 +177,17 @@ void EASY_SIM_CORE::CalcEASY_SIM_CORE()
 	currentFrame->time = currentFrame->time + dt;
 
 	currentFrame->direction += rotate * rotationRate;
+	if (currentFrame->direction < -PI) {
+		currentFrame->direction += 2 * PI;
+	}else if(currentFrame->direction > PI) {
+		currentFrame->direction -= 2 * PI;
+	}
+
+	//save some data into the frame
+	currentFrame->forceLift = lift;
+	currentFrame->forceTotalThrust = resultThrust;
+	currentFrame->forceDragForm = parasiticDrag;
+	currentFrame->AoA = angleOfAttack;
 }
 
 void EASY_SIM_CORE::draw()
@@ -239,8 +258,16 @@ void EASY_SIM_CORE::draw()
 	glTranslatef(position.first,position.second,0);
  //   drawOpenBox(0.01,0.01);      // -10 deg Rollmark
 	drawLine(0.05,currentFrame->direction*180 /  PI);
-    glPopMatrix();
-
+	//Draw Force Vectors (lift, thrust, parasiticDrag)
+	//currentFrame->z2 = - sin(directionOfSpeed) * parasiticDrag * 0.01;
+	//currentFrame->x2 = - cos(directionOfSpeed) * parasiticDrag * 0.01;
+	glColor3ubv(amber_0);
+	drawLine(0,0,-sin(currentFrame->direction) * 0.05,cos(currentFrame->direction) * 0.05);
+	glColor3ubv(white);
+	drawLine(0, 0, cos(currentFrame->direction) * 0.05, sin(currentFrame->direction) * 0.05);
+	glColor3ubv(green);
+	drawLine(0, 0, -cos(currentFrame->get_direction_of_speed()) * 0.05, -sin(currentFrame->get_direction_of_speed()) * 0.05);
+	glPopMatrix();
 	//glPushMatrix();
 	//glColor3ubv(white);
 	//glBegin(GL_POINTS);
@@ -380,19 +407,29 @@ void EASY_SIM_CORE::draw()
 
 	glTranslatef(0.8,0.3,0);
 	glScalef(FontScaleFactor,FontScaleFactor,0.0009f);
-    font0->print(Font::ALIGN_LEFT, "Queuesize: %d", queue.size());
-	glTranslatef(0.5,-20,0);
+    //font0->print(Font::ALIGN_LEFT, "Queuesize: %d", queue.size());
+	//glTranslatef(0.5,-20,0);
     font0->print(Font::ALIGN_LEFT, "Meter: %.3f", currentFrame->z0);
 	glTranslatef(0.5,-20,0);
     font0->print(Font::ALIGN_LEFT, "Speed: %.3f", sqrt(currentFrame->get_speed_squared()));
 	glTranslatef(0.5,-20,0);
     font0->print(Font::ALIGN_LEFT, "Time: %.3f", (float)Time/1000.0f);
 	glTranslatef(0.5,-20,0);
-    font0->print(Font::ALIGN_LEFT, "Meter x: %.3f", currentFrame->x0);
-	glTranslatef(0.5, -20, 0);
+    //font0->print(Font::ALIGN_LEFT, "Meter x: %.3f", currentFrame->x0);
+	//glTranslatef(0.5, -20, 0);
 	font0->print(Font::ALIGN_LEFT, "Angle in Degree: %.3f", currentFrame->direction*180 / PI);
+	glTranslatef(0.5, -20, 0);
+	font0->print(Font::ALIGN_LEFT, "Anlge of Attack: %.3f", currentFrame->AoA * 180 / PI);
+	glTranslatef(0.5, -30, 0);
 
-	glTranslatef(0.5,-30,0);
+
+	font0->print(Font::ALIGN_LEFT, "Lift: %.3f", (float) (currentFrame->forceLift / 1000));
+	glTranslatef(0.5, -20, 0);
+	font0->print(Font::ALIGN_LEFT, "Thrust: %.3f", (float) (currentFrame->forceTotalThrust / 1000));
+	glTranslatef(0.5, -20, 0);
+	font0->print(Font::ALIGN_LEFT, "Drag: %.3f", (float) (currentFrame->forceDragForm / 1000));
+	glTranslatef(0.5, -30, 0);
+
     font0->print(Font::ALIGN_LEFT, "SimTimedt: %.3f", currentFrame->time);
 	glTranslatef(0.5,-20,0);
     font0->print(Font::ALIGN_LEFT, "SYSTIME : %.3f", (float)TimeSys/1000.0f);

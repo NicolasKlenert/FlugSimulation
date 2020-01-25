@@ -10,6 +10,11 @@ struct TimeFrame {
 	double time = 0.0;
 	double direction = 0.0; //in radians
 
+	double forceLift = 0.0;
+	double forceDragForm = 0.0;
+	double forceTotalThrust = 0.0;
+	double AoA = 0.0;
+
 	double get_speed_squared() {
 		return x1*x1 + z1*z1;
 	}
