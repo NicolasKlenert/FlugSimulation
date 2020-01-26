@@ -487,6 +487,33 @@ void EASY_SIM_CORE::draw()
 		relativeRight = camera.getRelativeX(right);
 	}
 
+	//draw some Stars
+	left = camera.getLeft();
+	left -= fmod(left,starDistanceX) + starDistanceX;
+	right = camera.getRight();
+	right -= fmod(right, starDistanceX);
+	right += 2 * starDistanceX;
+	double bottom = camera.getBottom();
+	bottom -= fmod(bottom, starDistanceZ) + starDistanceZ;
+	if (bottom < starMinHeight) bottom = starMinHeight;
+	double top = camera.getTop();
+	top -= fmod(top, starDistanceZ);
+	top += 2 * starDistanceZ;
+	int xIteration = (int)((right - left) / starDistanceX);
+	int zIteration = (int)((top - bottom) / starDistanceZ);
+	for (int i = 0; i < xIteration; ++i) {
+		for (int j = 0; j < zIteration; ++j) {
+			double x = left + starDistanceX * i;
+			double z = bottom + starDistanceZ * j;
+			x += noise.positiveNoise(x, z, 5.6) * starDistanceX;
+			z += noise.positiveNoise(x, z, 6.5) * starDistanceZ;
+			//scattering
+			x += noise.noise(x, z, 7.1) * starScatter;
+			z += noise.noise(x, z, 8.2) * starScatter;
+			drawStar(camera.getRelativeX(x), camera.getRelativeZ(z));
+		}
+	}
+
 	//Draw Power Gauge
 	drawPowerGauge();
 
@@ -505,6 +532,8 @@ void EASY_SIM_CORE::draw()
     font0->print(Font::ALIGN_LEFT, "Time: %.3f", (float)Time/1000.0f);
 	glTranslatef(0.5,-20,0);
     //font0->print(Font::ALIGN_LEFT, "Meter x: %.3f", currentFrame->x0);
+	//glTranslatef(0.5, -20, 0);
+	//font0->print(Font::ALIGN_LEFT, "Iteration x: %.3f", xIteration);
 	//glTranslatef(0.5, -20, 0);
 	font0->print(Font::ALIGN_LEFT, "Ground Height: %.3f", calculate_height_of_ground(currentFrame->x0));
 	glTranslatef(0.5, -20, 0);
@@ -655,10 +684,10 @@ void EASY_SIM_CORE::drawPowerGauge() {
 void EASY_SIM_CORE::drawStar(double x, double z, double size) {
 	glPushMatrix();
 	glTranslatef(x, z, 0);
-	for (int i = 0; i < PI; i += 30 * DEGREES) {
+	for (float i = 0; i < 180; i += 45) {
 		glRotatef(i, 0, 0, 1);
 		glBegin(GL_LINE_STRIP);
-		glVertex2f(size, 0);
+		glVertex2f(-size, 0);
 		glVertex2f(size, 0);
 		glEnd();
 	}

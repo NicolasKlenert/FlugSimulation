@@ -79,7 +79,7 @@ double PerlinNoise::noise(double x, double y, double z) {
 }
 
 double PerlinNoise::positiveNoise(double x, double y, double z) {
-	return (noise(x,y,z) + 1.0) / 2.0;
+	return (this->noise(x,y,z) + 1.0) / 2.0;
 }
 
 double PerlinNoise::fade(double t) {
