@@ -59,7 +59,8 @@ int yPos = 0;									//y position of the clicked mouse
 bool bKeyUp = FALSE;
 bool bKeyDn = FALSE;
 int iWhichKey = 0;
-int rotateAoA = 0; // used to rotate angle of attack
+int rotateController = 0; // used to rotate the wing of the airplane
+int powerController = 0;
 
 bool quit = false;
 bool headUp = true;
@@ -263,26 +264,29 @@ int eventProcessor(void *p)
 			else if (event.key.keysym.sym == SDLK_RIGHT && !bKeyDn)
 			{
 				//view->setFocusPoint(e_X, view->getFocusPoint(e_X)+ 0.1);
-				rotateAoA = -1;
+				rotateController = -1;
+				powerController = 0;
 				bKeyDn = TRUE;
 			}
 			else if (event.key.keysym.sym == SDLK_LEFT && !bKeyDn)
 			{
 				//view->setFocusPoint(e_X, view->getFocusPoint(e_X)- 0.1);
-				rotateAoA = 1;
+				rotateController = 1;
+				powerController = 0;
 				bKeyDn = TRUE;
 			}
 			else if (event.key.keysym.sym == SDLK_UP && !bKeyDn)
 			{
 				//view->setFocusPoint(e_Y, view->getFocusPoint(e_Y)+ 0.1);
-
-				rotateAoA = 1;
+				rotateController = 0;
+				powerController = 1;
 				bKeyDn = TRUE;
 			}
 			else if (event.key.keysym.sym == SDLK_DOWN && !bKeyDn)
 			{
 				//view->setFocusPoint(e_Y, view->getFocusPoint(e_Y)- 0.1);
-				rotateAoA = -1;
+				rotateController = 0;
+				powerController = -1;
 				bKeyDn = TRUE;
 			}
 			else if (event.key.keysym.sym == SDLK_PERIOD)
@@ -641,9 +645,10 @@ int dataPainter(void *p)
 			}
 			last_tickFT = cur_tick;
 
+
 			if (bKeyDn)
 			{
-				easy_sim_class.rotate = rotateAoA;
+				
 				if (iWhichKey == 0)
 				{
 					
@@ -661,8 +666,12 @@ int dataPainter(void *p)
 					
 				}
 			} else {
-				easy_sim_class.rotate = 0;
+				rotateController = 0;
+				powerController = 0;
 			}
+
+			easy_sim_class.rotate = rotateController;
+			easy_sim_class.powerController = powerController;
 
 			Sleep(2);
 		}

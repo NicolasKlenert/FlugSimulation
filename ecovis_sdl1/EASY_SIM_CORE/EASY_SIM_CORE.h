@@ -36,6 +36,7 @@ public:
 	double extdt;
 	bool crashed;
 	int rotate;
+	int powerController;
 
 private:
 	void drawRhombus(float height, float width, float rotation, bool filled);
@@ -44,7 +45,14 @@ private:
 	void drawTriangle(float height, float angle, float rotation, bool filled);
 	void drawLine(float startX, float startY, float endX, float endY);
 	void drawLine(float length, float angle);
+	void drawPowerGauge();
+	void drawStar(double x, double z, double size = 0.02);
+
 	double calculate_drag(double coefficient);
+	double calculate_engine_velocity();
+	double calculate_height_of_ground(double x);
+	double get_noise_x(double x);
+	double get_noise_y(double x);
 
 	Font   *font0, *font1, *font2, *font3, *font4;
 	RectSprite *RSprite1;

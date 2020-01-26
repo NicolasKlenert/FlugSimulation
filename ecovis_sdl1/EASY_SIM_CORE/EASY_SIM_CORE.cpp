@@ -9,6 +9,7 @@
 
 #include "EASY_SIM_CORE.h"
 #include <math.h>
+#include "../Misc/PerlinNoise.h"
 
 #define PI 3.1415926535
 #define SIZE_QUEUE 1000
@@ -34,32 +35,81 @@ bool frameToDelete = false;
 
 float fscale = 0.001f;
 
-double m = 60000.0; //Mass in kg
-double g = -9.81; //Earth acceleration in m/s²
+const double m = 300000.0; //Mass in kg
+const double g = -9.81; //Earth acceleration in m/s²
 double dt = 0.020; //Time Step Width in s -> NOT USED
-double wingArea = 600.0; //Area of the wings m^2
-double airDensity = 1.200; //f(T,p) normally kg/m^3
-double ascentAviationCoefficient = 5.5;
-double startAviationCoefficient = 0.3;
-double maxAngleOfAttack = 20 * DEGREES;
-double totalLossAngle = 25 * DEGREES;
-double dragCoefficientFriction = 0.02;
-double dragCoefficientFormMin = 0.09;
-double dragCoefficientFormMax = 1.8;
-double oswaldNumber = 0.7;
-double wingSpan = 60;
-double rotationRate = 0.01;
-double maxThrust = 5000000.0;
+const double wingArea = 600.0; //Area of the wings m^2
+const double engineArea = 10.0;
+const double airDensity = 1.200; //f(T,p) normally kg/m^3
+const double ascentAviationCoefficient = 5.5;
+const double startAviationCoefficient = 0.3;
+const double maxAngleOfAttack = 20 * DEGREES;
+const double totalLossAngle = 25 * DEGREES;
+const double dragCoefficientFriction = 0.02;
+const double dragCoefficientFormMin = 0.09;
+const double dragCoefficientFormMax = 1.8;
+const double oswaldNumber = 0.7;
+const double wingSpan = 60;
+const double rotationRate = 0.0025;
+const double maxPower = 1.0;
+const double powerRate = maxPower * 0.0025;
+const double maxVelocity = 270;
+const double maxEngineVelocity = 90;
 
+const double cameraWidth = 1000;
+const double cameraHeight = 1000;
 
-//TODO: instead of a constant, create a function
-double ground = 0.0;
+const double noiseSamplingRate = 0.001; //scale, such that noise it not too rough or smooth
+const double noiseSamplingScatter = cameraWidth * 0.0005; // in meter
+const double noiseHeightMax = 400; //in meter
+const double noiseHeightMin = 0; //in meter
+const double noiseSamplingDistance = cameraWidth * 0.01; //in meter
 
-StaticDequeue<pair<double,double>, SIZE_QUEUE> queue = StaticDequeue<pair<double, double>, SIZE_QUEUE>(true);
+const double starMinHeight = 600; //in meter
+const double starDistanceZ = 500;
+const double starDistanceX = 400;
+const double starScatter = 200;
+
+PerlinNoise noise = PerlinNoise();
+
+const double powerGaugeHeight = 0.2;
+const double powerGaugeWidth = 0.04;
+const double powerGaugeLineWidth = 0.05;
+
+StaticDequeue<pair<double,double>, SIZE_QUEUE> trailQueue = StaticDequeue<pair<double, double>, SIZE_QUEUE>(true);
+//StaticDequeue<pair<double, double>, 50> starQueue = StaticDequeue<pair<double, double>, 50>(true);
 Camera camera;
 
 double EASY_SIM_CORE::calculate_drag(double coefficient) {
 	return 0.5 * airDensity * currentFrame->get_speed_squared() * coefficient * wingArea;
+}
+
+double EASY_SIM_CORE::calculate_engine_velocity() {
+	double speed = currentFrame->get_speed_squared();
+	double maxSpeed = maxVelocity * maxVelocity;
+	double speedRatio = speed / maxSpeed;
+	return maxEngineVelocity * (1 - speedRatio);
+}
+
+double EASY_SIM_CORE::get_noise_x(double x) {
+	return x + noise.noise(x, 1.3, 1.3) * noiseSamplingScatter;
+}
+
+double EASY_SIM_CORE::get_noise_y(double x) {
+	return (
+			(0.572 * (noise.noise(x * noiseSamplingRate, 0.3, 0.3)))
+			+ (0.28 * noise.noise(x * noiseSamplingRate * 4, 2.7,2.7))
+			+ (0.1248 * noise.noise(x * noiseSamplingRate * 16, 3.4,3.4))
+		+ 1) * (noiseHeightMax - noiseHeightMin) * 0.5;
+}
+
+double EASY_SIM_CORE::calculate_height_of_ground(double x) {
+	double left = x - fmod(x,noiseSamplingDistance);
+	double right = left + noiseSamplingDistance;
+	double leftY = get_noise_y(left);
+	double rightY = get_noise_y(right);
+	double t = (x - left) / noiseSamplingDistance;
+	return leftY * (1 - t) + rightY * t;
 }
 
 EASY_SIM_CORE::EASY_SIM_CORE(int DisplayWidth, int DisplayHeight, TimeFrame* startValues)
@@ -78,10 +128,11 @@ EASY_SIM_CORE::EASY_SIM_CORE(int DisplayWidth, int DisplayHeight, TimeFrame* sta
 	extdt = 0;
 	TimeSys = 0;
 	rotate = 0;
+	powerController = 0;
 
 	reset(startValues);
 
-	camera = Camera(1000,1000,currentFrame->x0, currentFrame->z0);
+	camera = Camera(cameraWidth,cameraHeight,currentFrame->x0, currentFrame->z0);
 	crashed = false;
 	
 	for(int GN=0; GN <= 3; GN++)
@@ -106,7 +157,8 @@ void EASY_SIM_CORE::reset(TimeFrame* startValues) {
 		currentFrame = new TimeFrame();
 		//add some value so something happens
 		currentFrame->x1 = 100.0;
-		currentFrame->z0 = 1000.0;
+		currentFrame->z0 = 500.0;
+		currentFrame->power = 0.7 * maxPower;
 		frameToDelete = true;
 	} else {
 		currentFrame = startValues; 
@@ -157,7 +209,15 @@ void EASY_SIM_CORE::CalcEASY_SIM_CORE()
 	double dragCoefficientInduced = aviationCoefficient * aviationCoefficient / (PI * oswaldNumber * wingAspectRatio);
 	double dragCoefficientParasitic = dragCoefficientFriction + dragCoefficientFormMin + dragCoefficientFormMax * (sin(angleOfAttack) + 1) * 0.5;
 
-	double resultThrust = maxThrust;// -this->calculate_drag(dragCoefficientInduced);
+	// calculate thrust through power (power is linear exhaust velocity (90m/s for 0m/s airspeed) or so)
+	double engineVelocity = calculate_engine_velocity() * currentFrame->power;
+	double thrust = engineArea * currentFrame->get_speed_in_direction(currentFrame->direction) * airDensity * engineVelocity * engineVelocity;
+	if (thrust < 0.0) {
+		thrust = 0.0;
+	}
+
+	double inducedDrag = this->calculate_drag(dragCoefficientInduced);
+	double resultThrust = thrust - inducedDrag;
 	double parasiticDrag = this->calculate_drag(dragCoefficientParasitic);
 
 	currentFrame->z2 = g + cos(currentFrame->direction) * lift / m + sin(currentFrame->direction) * resultThrust / m -sin(directionOfSpeed) * parasiticDrag / m;
@@ -170,9 +230,8 @@ void EASY_SIM_CORE::CalcEASY_SIM_CORE()
 	x0dt = currentFrame->x1*dt;
 	currentFrame->x0 = currentFrame->x0 + x0dt;
 
-	queue.push_front(pair<double,double>(currentFrame->x0, currentFrame->z0));
+	trailQueue.push_front(pair<double,double>(currentFrame->x0, currentFrame->z0));
 	camera.setFocusPoint(currentFrame->x0, currentFrame->z0);
-	if (currentFrame->z0 < ground) crashed = true;
 	
 	currentFrame->time = currentFrame->time + dt;
 
@@ -183,11 +242,22 @@ void EASY_SIM_CORE::CalcEASY_SIM_CORE()
 		currentFrame->direction -= 2 * PI;
 	}
 
+	currentFrame->power += powerController * powerRate;
+	if (currentFrame->power < 0) {
+		currentFrame->power = 0;
+	}else if(currentFrame->power > maxPower){
+		currentFrame->power = maxPower;
+	}
+
 	//save some data into the frame
 	currentFrame->forceLift = lift;
 	currentFrame->forceTotalThrust = resultThrust;
 	currentFrame->forceDragForm = parasiticDrag;
+	currentFrame->forceDragInduced = inducedDrag;
 	currentFrame->AoA = angleOfAttack;
+
+	//test crash
+	if (currentFrame->z0 < calculate_height_of_ground(currentFrame->x0)) crashed = true;
 }
 
 void EASY_SIM_CORE::draw()
@@ -253,20 +323,21 @@ void EASY_SIM_CORE::draw()
 	glPushMatrix();
  //   //glRotatef(0,0,0,1);
  //   //glTranslatef(0.2+(Engine1RPM*0.0001),0.2,0);
-	pair<double, double> position = camera.getRelativePosition(queue.front());
+	pair<double, double> position = camera.getRelativePosition(trailQueue.front());
 	////+0.1 and +0.5 instead of +0.3 like in the camera
 	glTranslatef(position.first,position.second,0);
  //   drawOpenBox(0.01,0.01);      // -10 deg Rollmark
 	drawLine(0.05,currentFrame->direction*180 /  PI);
-	//Draw Force Vectors (lift, thrust, parasiticDrag)
+	//---- DEBUG ---- Draw Force Vectors (lift, thrust, parasiticDrag)
 	//currentFrame->z2 = - sin(directionOfSpeed) * parasiticDrag * 0.01;
 	//currentFrame->x2 = - cos(directionOfSpeed) * parasiticDrag * 0.01;
-	glColor3ubv(amber_0);
-	drawLine(0,0,-sin(currentFrame->direction) * 0.05,cos(currentFrame->direction) * 0.05);
-	glColor3ubv(white);
-	drawLine(0, 0, cos(currentFrame->direction) * 0.05, sin(currentFrame->direction) * 0.05);
-	glColor3ubv(green);
-	drawLine(0, 0, -cos(currentFrame->get_direction_of_speed()) * 0.05, -sin(currentFrame->get_direction_of_speed()) * 0.05);
+	//glColor3ubv(amber_0);
+	//drawLine(0,0,-sin(currentFrame->direction) * 0.05,cos(currentFrame->direction) * 0.05);
+	//glColor3ubv(white);
+	//drawLine(0, 0, cos(currentFrame->direction) * 0.05, sin(currentFrame->direction) * 0.05);
+	//glColor3ubv(green);
+	//drawLine(0, 0, -cos(currentFrame->get_direction_of_speed()) * 0.05, -sin(currentFrame->get_direction_of_speed()) * 0.05);
+	// --- END DEBUG ----
 	glPopMatrix();
 	//glPushMatrix();
 	//glColor3ubv(white);
@@ -280,9 +351,9 @@ void EASY_SIM_CORE::draw()
 		
 			glColor3ubv(white);
 			glBegin(GL_POINTS);
-			for(int count=0; count < queue.size(); count++)
+			for(int count=0; count < trailQueue.size(); count++)
 				{
-					position = camera.getRelativePosition(queue[count]);
+					position = camera.getRelativePosition(trailQueue[count]);
    					glVertex2f(position.first, position.second);
 					
 				}
@@ -397,9 +468,27 @@ void EASY_SIM_CORE::draw()
 	//glPopMatrix();
 	//Graph##############################################################
 
-	//Draw ground (TODO: only if we can see the ground)
-	double relativeGround = camera.getRelativeZ(0.0);
-	drawLine(0.0, relativeGround, 1.0, relativeGround);
+	//Draw ground
+	double left = camera.getLeft();
+	left -= fmod(left, noiseSamplingDistance);
+	double right = left + noiseSamplingDistance;
+	double relativeHeightLeft = camera.getRelativeZ(get_noise_y(left));
+	double relativeHeightRight = camera.getRelativeZ(get_noise_y(right));
+	double relativeLeft = camera.getRelativeX(left);
+	double relativeRight = camera.getRelativeX(right);
+	while (right < camera.getRight() + noiseSamplingDistance) {
+		drawLine(relativeLeft, relativeHeightLeft, relativeRight, relativeHeightRight);
+		//go to the next pair
+		left = right;
+		relativeHeightLeft = relativeHeightRight;
+		relativeLeft = relativeRight;
+		right += noiseSamplingDistance;
+		relativeHeightRight = camera.getRelativeZ(get_noise_y(right));
+		relativeRight = camera.getRelativeX(right);
+	}
+
+	//Draw Power Gauge
+	drawPowerGauge();
 
     glPushMatrix();
 	glColor3ubv(amber_0);
@@ -417,6 +506,8 @@ void EASY_SIM_CORE::draw()
 	glTranslatef(0.5,-20,0);
     //font0->print(Font::ALIGN_LEFT, "Meter x: %.3f", currentFrame->x0);
 	//glTranslatef(0.5, -20, 0);
+	font0->print(Font::ALIGN_LEFT, "Ground Height: %.3f", calculate_height_of_ground(currentFrame->x0));
+	glTranslatef(0.5, -20, 0);
 	font0->print(Font::ALIGN_LEFT, "Angle in Degree: %.3f", currentFrame->direction*180 / PI);
 	glTranslatef(0.5, -20, 0);
 	font0->print(Font::ALIGN_LEFT, "Anlge of Attack: %.3f", currentFrame->AoA * 180 / PI);
@@ -537,4 +628,39 @@ void EASY_SIM_CORE::drawOpenBox(float height, float width)
         glVertex2f( width/2, 0);
 		glVertex2f(-width/2, 0);
     glEnd();
+}
+
+void EASY_SIM_CORE::drawPowerGauge() {
+	const double heightOfPower = (currentFrame->power / maxPower) * powerGaugeHeight;
+	glPushMatrix();
+	glTranslatef(0.05 + powerGaugeLineWidth / 2,0.05,0);
+	//empty box
+	glColor3ubv(white);
+	glBegin(GL_LINE_STRIP);
+	glVertex2f(-powerGaugeWidth / 2, 0);
+	glVertex2f(powerGaugeWidth / 2,0);
+	glVertex2f(powerGaugeWidth / 2, powerGaugeHeight);
+	glVertex2f(-powerGaugeWidth / 2, powerGaugeHeight);
+	glVertex2f(-powerGaugeWidth / 2,0);
+	glEnd();
+	//line to show power
+	glColor3ubv(amber_0);
+	glBegin(GL_LINE_STRIP);
+	glVertex2f(-powerGaugeLineWidth /2, heightOfPower);
+	glVertex2f(powerGaugeLineWidth /2, heightOfPower);
+	glEnd();
+	glPopMatrix();
+}
+
+void EASY_SIM_CORE::drawStar(double x, double z, double size) {
+	glPushMatrix();
+	glTranslatef(x, z, 0);
+	for (int i = 0; i < PI; i += 30 * DEGREES) {
+		glRotatef(i, 0, 0, 1);
+		glBegin(GL_LINE_STRIP);
+		glVertex2f(size, 0);
+		glVertex2f(size, 0);
+		glEnd();
+	}
+	glPopMatrix();
 }

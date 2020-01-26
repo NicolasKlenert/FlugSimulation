@@ -28,6 +28,10 @@ double calculateRelative(double val, double focusPoint, double dimension, double
 	return ((val - focusPoint) / dimension) + mid;
 }
 
+double calculateAbsolut(double val, double focusPoint, double dimension, double mid) {
+	return (val - mid) * dimension + focusPoint;
+}
+
 double Camera::getRelativeX(double x) {
 	return calculateRelative(x, focusPointX, width, focusX);
 }
@@ -56,17 +60,17 @@ void Camera::setFocusPoint(double xCoord, double zCoord) {
 }
 
 double Camera::getLeft() {
-	return 0.0;
+	return calculateAbsolut(0.0,focusPointX, width, focusX);
 }
 
 double Camera::getRight() {
-	return 0.0;
+	return calculateAbsolut(1.0,focusPointX, width, focusX);
 }
 
 double Camera::getTop() {
-	return 0.0;
+	return calculateAbsolut(1.0, focusPointZ, height, focusZ);
 }
 
 double Camera::getBottom() {
-	return 0.0;
+	return calculateAbsolut(0.0, focusPointZ, height, focusZ);
 }
