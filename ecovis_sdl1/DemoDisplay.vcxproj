@@ -1,0 +1,200 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{8630137E-3247-48D0-9FC9-5C48192A31D4}</ProjectGuid>
+    <RootNamespace>DemoDisplay</RootNamespace>
+    <Keyword>Win32Proj</Keyword>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+    <WholeProgramOptimization>PGOptimize</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>11.0.50727.1</_ProjectFileVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>..\bin\</OutDir>
+    <IntDir>..\compile\</IntDir>
+    <LinkIncremental />
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>..\bin\release\</OutDir>
+    <IntDir>..\compile\</IntDir>
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>../include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>true</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <StructMemberAlignment>Default</StructMemberAlignment>
+      <PrecompiledHeader />
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <TreatWChar_tAsBuiltInType>false</TreatWChar_tAsBuiltInType>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>OpenGL32.lib;Glu32.lib;SDL2_net.lib;SDL2.lib;SDL2main.lib;libfreetype.lib;SDL2_mixer.lib;freeglut.lib;alut.lib;legacy_stdio_definitions.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention />
+      <TargetMachine>MachineX86</TargetMachine>
+      <Profile>true</Profile>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <Optimization>Full</Optimization>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <OmitFramePointers>true</OmitFramePointers>
+      <AdditionalIncludeDirectories>../include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <StructMemberAlignment>Default</StructMemberAlignment>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <PrecompiledHeader />
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat />
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>OpenGL32.lib;Glu32.lib;SDL_net.lib;SDL.lib;SDLmain.lib;libfreetype.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention />
+      <TargetMachine>MachineX86</TargetMachine>
+      <LinkTimeCodeGeneration>PGOptimization</LinkTimeCodeGeneration>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="EASY_SIM_CORE\EASY_SIM_CORE.cpp" />
+    <ClCompile Include="Data\CallBack.cpp" />
+    <ClCompile Include="EASY_SIM_CORE\TimeFrame.h" />
+    <ClCompile Include="Misc\Camera.cpp" />
+    <ClCompile Include="Misc\Noise.cpp" />
+    <ClCompile Include="Misc\PerlinNoise.cpp" />
+    <ClCompile Include="PFD\circleGenerator.cpp" />
+    <ClCompile Include="Data\Coordinate.cpp" />
+    <ClCompile Include="Graphics\Coordinate2D.cpp" />
+    <ClCompile Include="Graphics\Font.cpp" />
+    <ClCompile Include="Data\GeocentricCoordinate.cpp" />
+    <ClCompile Include="Data\GeographicCoordinate.cpp" />
+    <ClCompile Include="PFD\geometryVariables.cpp" />
+    <ClCompile Include="Graphics\Graphics.cpp" />
+    <ClCompile Include="Graphics\GroupSprite.cpp" />
+    <ClCompile Include="Graphics\ImageSprite.cpp" />
+    <ClCompile Include="Graphics\LineSprite.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="Data\Matrix.cpp" />
+    <ClCompile Include="Network\network.cpp" />
+    <ClCompile Include="PFD\NetworkHandler.cpp" />
+    <ClCompile Include="Graphics\Perspective.cpp" />
+    <ClCompile Include="Graphics\RectSprite.cpp" />
+    <ClCompile Include="Graphics\Sprite.cpp" />
+    <ClCompile Include="PFD\TCPIP.cpp" />
+    <ClCompile Include="Graphics\TextSprite.cpp" />
+    <ClCompile Include="Graphics\Texture.cpp" />
+    <ClCompile Include="PFD\tools.cpp" />
+    <ClCompile Include="Data\TopocentricCoordinate.cpp" />
+    <ClCompile Include="Data\TopocentricReference.cpp" />
+    <ClCompile Include="PFD\UDP.cpp" />
+    <ClCompile Include="Data\Vector.cpp" />
+    <ClCompile Include="Graphics\ViewPort.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="EASY_SIM_CORE\EASY_SIM_CORE.h" />
+    <ClInclude Include="Misc\Camera.h" />
+    <ClInclude Include="Misc\PerlinNoise.h" />
+    <ClInclude Include="Misc\StaticDequeue.h" />
+    <ClInclude Include="Misc\Noise.h" />
+    <ClInclude Include="Misc\RandomNumberGenerator.h" />
+    <ClInclude Include="PFD\adi_background.h" />
+    <ClInclude Include="Data\CallBack.h" />
+    <ClInclude Include="PFD\circleGenerator.h" />
+    <ClInclude Include="Data\colors.h" />
+    <ClInclude Include="Graphics\colors.h" />
+    <ClInclude Include="Data\constants.h" />
+    <ClInclude Include="Data\Coordinate.h" />
+    <ClInclude Include="Graphics\Coordinate2D.h" />
+    <ClInclude Include="PFD\definitions.h" />
+    <ClInclude Include="Graphics\Drawable.h" />
+    <ClInclude Include="PFD\econv.h" />
+    <ClInclude Include="FCC_LABEL_DEF.h" />
+    <ClInclude Include="Graphics\Font.h" />
+    <ClInclude Include="Data\GeocentricCoordinate.h" />
+    <ClInclude Include="Data\GeographicCoordinate.h" />
+    <ClInclude Include="PFD\geometryVariables.h" />
+    <ClInclude Include="Graphics\gl_headers.h" />
+    <ClInclude Include="Graphics\Graphics.h" />
+    <ClInclude Include="Graphics\GroupSprite.h" />
+    <ClInclude Include="Graphics\ImageSprite.h" />
+    <ClInclude Include="PFD\labels.h" />
+    <ClInclude Include="Graphics\LineSprite.h" />
+    <ClInclude Include="Data\mathTools.h" />
+    <ClInclude Include="Data\Matrix.h" />
+    <ClInclude Include="Network\network.h" />
+    <ClInclude Include="PFD\NetworkHandler.h" />
+    <ClInclude Include="Graphics\Perspective.h" />
+    <ClInclude Include="Graphics\RectSprite.h" />
+    <ClInclude Include="Graphics\Sprite.h" />
+    <ClInclude Include="PFD\structs.h" />
+    <ClInclude Include="PFD\Structs1.h" />
+    <ClInclude Include="PFD\TCPIP.h" />
+    <ClInclude Include="PFD\TCPStructs.h" />
+    <ClInclude Include="Graphics\TextSprite.h" />
+    <ClInclude Include="Graphics\Texture.h" />
+    <ClInclude Include="PFD\tools.h" />
+    <ClInclude Include="Data\TopocentricCoordinate.h" />
+    <ClInclude Include="Data\TopocentricReference.h" />
+    <ClInclude Include="PFD\UDP.h" />
+    <ClInclude Include="Misc\units.h" />
+    <ClInclude Include="Data\Vector.h" />
+    <ClInclude Include="Data\VectorMath.h" />
+    <ClInclude Include="Graphics\ViewPort.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ClassDiagram11.cd" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
